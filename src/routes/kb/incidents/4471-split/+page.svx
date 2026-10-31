@@ -1,0 +1,57 @@
+---
+layout: runbook
+title: '#4471 · two problems, one ticket'
+owner: kacputer
+status: open
+reviewed: 2026-10-31
+signature: v1.eyJzdWIiOiI2OTQxIiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTM0NzkzNzcsImV4cCI6MTc5MzU2NTc3N30.lxRhvC-_slb-pVQuRQ8q0qIWOyJp8XL--_ZABw005H4
+---
+
+<script>
+  import CauseTable from '#lib/kb/CauseTable.svelte';
+  import DedupeExplorer from '#lib/kb/DedupeExplorer.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+[#4471](/kb/incidents/4471) is marked known, with one fix queued. It holds two problems, and
+that fix reaches only one of them. Each now has its own ticket.
+
+<CauseTable ticket={4471} />
+
+The table's last column compares each cause with #4471 only. The cause it calls "no ticket of
+its own" now has one, below.
+
+## The two problems
+
+**`parser`: [ticket #1](https://github.com/kacputer/kb-4471-split/issues/1).** The shared parser
+reads every date month first, and these tenants write the day first. The dates come out flipped.
+This is the fix already queued under #4471.
+
+**`hint`: [ticket #2](https://github.com/kacputer/kb-4471-split/issues/2).** Under its date field,
+`booking-v3` prints `MM/DD/YYYY`. People type month first as told, and the form reads the date the
+tenant's way, day first. These reports come only through the form, from tenants on `booking-v3`.
+The parser fix does not change this: the hint and the form still disagree.
+
+<Callout kind="warn">
+Do not close <code>hint</code> when the parser fix ships. Its reports look the same as the others, a day and
+a month swapped, so check the form itself.
+</Callout>
+
+## How to tell them apart
+
+Look up the tenant, then ask how the report came in. The subject does not help, because both
+causes share subject lines. Neither does the intake tag: it is a guess from the reporter's
+browser, and every `en-US` browser was tagged `hint`, whatever the tenant runs.
+
+<DedupeExplorer />
+
+## What this does not settle
+
+The note under the table lists reports the desk read as a one-day move. They are counted where the
+tenant places them, but a flipped day and month does not explain a one-day move. Nobody has
+checked them against a cause yet, so read them again once both fixes ship.
+
+The export overlaps, so some reports appear twice. The table counts each id once.
+
+<RenderStamp {signature} />
